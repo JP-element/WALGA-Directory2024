@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Display a map on a webpage</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+<style>
+body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+#container { width: 100%; height: 100vh; display: flex; flex-direction: column; }
+#header { background-color: #ccebf6; padding: 10px; font-size: 24px; font-weight: bold; text-align: center; }
+#map { flex: 1; }
+</style>
+</head>
+<body>
+<div id="container">
+    <div id="header">WALGA LGA Directory 23-24</div>
+    <div id="map"></div>
+</div>
+<script>
+mapboxgl.accessToken = atob("cGsuZXlKMUlqb2lhbmN0Y0dGeWEyVnlJaXdpWVNJNkltTnNkelUwTUdONFpqRmljRGt5YVd4amMzTjZkR3RoZDJZaWZRLkFMOF85TzRIUEVGWGNxNnhSSXlLSVE=");
+var map = new mapboxgl.Map({
+    container: 'map', // container ID
+    center: [115.859, -31.95323], // starting position [lng, lat]
+    style: 'mapbox://styles/jw-parker/clw6h9irr002801po0lfmbqej', // style URL
+    zoom: 9 // starting zoom
+});
+
+map.on('click', function(event) {
+    console.log('Mouse Clicked');
+    console.log(event.point);
+
+    var parameters = {
+        layers: ['LGA Overlay']
+    };
+    var features = map.queryRenderedFeatures(event.point, parameters);
+    
+    if (features.length > 0) {
+        var LGADetails = features[0];
+        console.log('Feature details:', LGADetails);
+
+        // Ensure the properties object is available
+        if (LGADetails.properties) {
+            console.log('Properties:', LGADetails.properties);
+
+            // Use bracket notation to access property names with spaces
+            var Address = LGADetails.properties["Address"];
+            var Population = LGADetails.properties["Population"];
+            var Employees = LGADetails.properties["Employees"];
+            var TestMaths = Population - Employees;
+            var LGAName = LGADetails.properties["LGA name"]; // Accessing property with space in its name
+
+            console.log(Address, Population, Employees, TestMaths, LGAName);
+
+            var popup = new mapboxgl.Popup()
+            .setLngLat(event.lngLat)
+            .setHTML('<h2 style="margin: 0 0 10px 0;">' + LGAName + '</h2>' +
+            '<dl style="margin: 0;">' +
+            '<dt style="margin-bottom: 5px;">Address</dt>' +
+            '<dd style="margin: 0 0 10px 0; font-weight: bold;">' + Address +'</dd>' +
+            '<dt style="margin-bottom: 5px;">Population</dt>' +
+            '<dd style="margin: 0 0 10px 0; font-weight: bold;">'+ Population +'</dd>' +
+            '<dt style="margin-bottom: 5px;">Employees</dt>' +
+            '<dd style="margin: 0 0 10px 0; font-weight: bold;">'+ Employees +'</dd>' +
+            '<dt style="margin-bottom: 5px;">TestMaths</dt>' +
+            '<dd style="margin: 0 0 10px 0; font-weight: bold;">'+ TestMaths + '</dd>' +
+            '</dl>')
+            .addTo(map);
+        } 
+        
+        else {
+            console.log('No properties found on the feature.');
+        }
+    } else {
+        console.log('No features found at the clicked location.');
+    }
+});
+</script>
+</body>
+</html>
