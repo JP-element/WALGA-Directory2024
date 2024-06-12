@@ -108,7 +108,7 @@ map.on('click', function(event) {
             var totalRevenue = LGADetails.properties["Total Revenue"];
             var website = LGADetails.properties["Website"];
             var email = LGADetails.properties["email"];
-            var TestMaths = Population - Employees; // this is some test maths to that is proving the dynamic nature of the data
+            var TestMaths = Population / areaSqkm; // this is some test maths to that is proving the dynamic nature of the data
             
             var formatNumber = function(num) {
                 return num ? num.toLocaleString() : '';
@@ -119,7 +119,9 @@ map.on('click', function(event) {
 };
 
             console.log(Address, Population, Employees, TestMaths, LGAName);
-
+            
+            var roundedPopulationDensity = Math.floor(TestMaths,1); // Round down to nearest integer
+            
             var popup = new mapboxgl.Popup()
             .setLngLat(event.lngLat)
             .setHTML(
@@ -133,6 +135,10 @@ map.on('click', function(event) {
                 '<div style="margin-bottom: 5px; display: flex; justify-content: space-between;">' +
                     '<dt style="font-weight: bold;">Population:</dt>' +
                     '<dd style="margin: 0; font-weight: normal; text-align: right;">' + formatNumber(Population) + '</dd>' +
+                '</div>' +
+                '<div style="margin-bottom: 5px; display: flex; justify-content: space-between;">' +
+                    '<dt style="font-weight: bold;">Population Density:</dt>' +
+                    '<dd style="margin: 0; font-weight: normal; text-align: right;">' + formatNumber(roundedPopulationDensity) + ' persons/sqkm</dd>' +
                 '</div>' +
                 '<div style="margin-bottom: 5px; display: flex; justify-content: space-between;">' +
                     '<dt style="font-weight: bold;">Employees:</dt>' +
