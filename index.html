@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R4BVJXFDJ5"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-R4BVJXFDJ5');
+    </script>
+    <meta charset="utf-8">
+    <title>WALGA Directory 2024</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+    <style>
+        :root {
+            color-scheme: dark;
+            --glass-bg: rgba(15, 23, 42, 0.72);
+            --glass-border: rgba(148, 163, 184, 0.25);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5f5;
+            --accent: #38bdf8;
+            --surface: rgba(15, 23, 42, 0.92);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at top, #0f172a 0%, #020617 55%, #000 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-shell {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 24px;
+            padding-top: 140px;
+            gap: 20px;
+        }
+
+        .map-area {
+            position: relative;
+            flex: 1;
+            display: flex;
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .map-frame {
+            position: relative;
+            flex: 1;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        #header {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            right: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-radius: 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.35);
+            z-index: 10;
+        }
+
+        #header-content {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        #header-title {
+            margin: 0;
+            font-size: clamp(1.5rem, 2vw, 1.875rem);
+            font-weight: 600;
+            letter-spacing: 0.01em;
+        }
+
+        #header-subtitle {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
+
+        #header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 18px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(56, 189, 248, 0.05));
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease;
+        }
+
+        .header-button:hover {
+            transform: translateY(-1px);
+            border-color: rgba(56, 189, 248, 0.7);
+            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.25);
+        }
+
+        #logo {
+            height: 44px;
+            width: auto;
+            filter: drop-shadow(0 4px 12px rgba(15, 23, 42, 0.55));
+        }
+
+        #info-panel {
+            width: clamp(260px, 26vw, 340px);
+            padding: 24px;
+            border-radius: 24px;
+            background: var(--surface);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.45);
+        }
+
+        #info-title {
+            margin: 0;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .info-description {
+            margin: 0;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .info-list {
+            margin: 0;
+            padding-left: 18px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+
+        .info-footer {
+            margin-top: auto;
+            font-size: 0.85rem;
+            color: rgba(203, 213, 225, 0.8);
+        }
+
+        @media (max-width: 1024px) {
+            .app-shell {
+                padding: 16px;
+                padding-top: 160px;
+            }
+
+            #header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 18px;
+            }
+
+            #header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .map-area {
+                flex-direction: column;
+            }
+
+            #info-panel {
+                width: 100%;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+
+            .info-list {
+                flex: 1 1 180px;
+                margin: 0;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .app-shell {
+                padding: 12px;
+                padding-top: 180px;
+            }
+
+            #header {
+                top: 12px;
+                left: 12px;
+                right: 12px;
+                padding: 16px;
+            }
+
+            .map-area {
+                gap: 16px;
+            }
+
+            #info-panel {
+                padding: 18px;
+            }
+        }
+
+        .mapboxgl-popup-content {
+            font-family: 'Inter', sans-serif;
+            background: rgba(15, 23, 42, 0.95);
+            border-radius: 18px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            color: var(--text-primary);
+            box-shadow: 0 18px 45px rgba(2, 6, 23, 0.65);
+            padding: 18px 20px 22px;
+        }
+
+        .mapboxgl-popup-content h2 {
+            margin: 0 0 12px 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .mapboxgl-popup-close-button {
+            color: var(--text-secondary);
+        }
+
+        .popup-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px 16px;
+        }
+
+        .popup-grid div {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .popup-label {
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .popup-value {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .popup-value a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .popup-value a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <header id="header">
+            <div id="header-content">
+                <h1 id="header-title">WALGA Directory 2024</h1>
+                <p id="header-subtitle">Discover Western Australia’s Local Government Areas through interactive insights.</p>
+            </div>
+            <div id="header-actions">
+                <a class="header-button" href="https://walga.asn.au" target="_blank" rel="noopener">Visit WALGA</a>
+                <img id="logo" src="colab.png" alt="WALGA logo">
+            </div>
+        </header>
+        <main class="map-area">
+            <div class="map-frame">
+                <div id="map"></div>
+            </div>
+            <aside id="info-panel">
+                <h2 id="info-title">How to use the map</h2>
+                <p class="info-description">Zoom, pan, and tap any Local Government Area to reveal tailored details including population, infrastructure, and contact information.</p>
+                <ul class="info-list">
+                    <li>Use the scroll wheel or pinch to zoom.</li>
+                    <li>Click an LGA boundary to open its detailed profile.</li>
+                    <li>Follow the website and email links for direct outreach.</li>
+                </ul>
+                <p class="info-footer">Data sourced from WALGA’s 2024 Directory.</p>
+            </aside>
+        </main>
+    </div>
+<script>
+mapboxgl.accessToken = atob("cGsuZXlKMUlqb2lhbmN0Y0dGeWEyVnlJaXdpWVNJNkltTnNkelUwTUdONFpqRmljRGt5YVd4amMzTjZkR3RoZDJZaWZRLkFMOF85TzRIUEVGWGNxNnhSSXlLSVE=");
+var map = new mapboxgl.Map({
+    container: 'map', // container ID
+    center: [115.859, -31.95323], // starting position [lng, lat]
+    pitch: 60,
+    style: 'mapbox://styles/jw-parker/clw6h9irr002801po0lfmbqej', // style URL
+    zoom: 9 // starting zoom
+});
+
+map.on('click', function(event) {
+    console.log('Mouse Clicked');
+    console.log(event.point);
+
+    var parameters = {
+        layers: ['LGA Overlay']
+    };
+    var features = map.queryRenderedFeatures(event.point, parameters);
+    
+    if (features.length > 0) {
+        var LGADetails = features[0];
+        console.log('Feature details:', LGADetails);
+
+        // Ensure the properties object is available
+        if (LGADetails.properties) {
+            console.log('Properties:', LGADetails.properties);
+
+            // Use bracket notation to access property names with spaces
+            var LGAName = LGADetails.properties["LGA name"]; // Accessing property with space in its name
+            var Address = LGADetails.properties["Address"];
+            var Population = LGADetails.properties["Population"];
+            var Employees = LGADetails.properties["Employees"];
+            var areaSqkm = LGADetails.properties["Area(sqkm)"];
+            var distanceToPerth = LGADetails.properties["Distance to Perth"];
+            var lengthOfSealedRoadKm = LGADetails.properties["Length of Sealed Road (km)"];
+            var lengthOfUnsealedRoadKm = LGADetails.properties["Length of Unsealed Road (km)"];
+            var numberOfDwellings = LGADetails.properties["Number of Dwellings"];
+            var numberOfElectors = LGADetails.properties["Number of Electors"];
+            var phoneNumber = LGADetails.properties["Phone number"];
+            var totalRatesLevied = LGADetails.properties["Total Rates Levied"];
+            var totalRevenue = LGADetails.properties["Total Revenue"];
+            var website = LGADetails.properties["Website"];
+            var email = LGADetails.properties["email"];
+            
+            var hasValue = function(value) {
+                return !(value === null || value === undefined || value === '');
+            };
+
+            var formatNumber = function(value) {
+                if (!hasValue(value)) {
+                    return '—';
+                }
+
+                var number = Number(value);
+                if (!isNaN(number)) {
+                    return number.toLocaleString();
+                }
+
+                return value;
+            };
+
+            var formatCurrency = function(value) {
+                if (!hasValue(value)) {
+                    return '—';
+                }
+
+                var number = Number(value);
+                if (!isNaN(number)) {
+                    return '$' + number.toLocaleString();
+                }
+
+                return value;
+            };
+
+            console.log(Address, Population, Employees, LGAName);
+            
+            var populationDensity = (hasValue(Population) && hasValue(areaSqkm) && Number(areaSqkm) !== 0)
+                ? Number(Population) / Number(areaSqkm)
+                : null;
+            var roundedPopulationDensity = (populationDensity !== null && !isNaN(populationDensity))
+                ? Math.round(populationDensity)
+                : null;
+
+            var safeLink = function(url) {
+                if (!url) {
+                    return null;
+                }
+
+                var trimmed = url.trim();
+                if (!trimmed) {
+                    return null;
+                }
+
+                if (!/^https?:\/\//i.test(trimmed)) {
+                    return 'https://' + trimmed;
+                }
+
+                return trimmed;
+            };
+
+            var websiteLink = safeLink(website);
+
+            var popupHtml = '<div>' +
+                '<h2>' + (LGAName || 'Local Government Area') + '</h2>' +
+                '<div class="popup-grid">' +
+                    '<div>' +
+                        '<span class="popup-label">Address</span>' +
+                        '<span class="popup-value">' + (Address || '—') + '</span>' +
+                    '</div>' +
+                    '<div>' +
+                        '<span class="popup-label">Population</span>' +
+                        '<span class="popup-value">' + formatNumber(Population) + '</span>' +
+                    '</div>' +
+                    '<div>' +
+                        '<span class="popup-label">Population Density</span>' +
+                        '<span class="popup-value">' + (roundedPopulationDensity !== null ? formatNumber(roundedPopulationDensity) + ' persons/sqkm' : '—') + '</span>' +
+                    '</div>' +
+                    '<div>' +
+                        '<span class="popup-label">Employees</span>' +
+                        '<span class="popup-value">' + formatNumber(Employees) + '</span>' +
+                    '</div>' +
+                    '<div>' +
+                        '<span class="popup-label">Area (sq km)</span>' +
+                        '<span class="popup-value">' + formatNumber(areaSqkm) + '</span>' +
+                    '</div>' +
+                    '<div>' +
+                        '<span class="popup-label">Distance to Perth</span>' +
+                        '<span class="popup-value">' + (hasValue(distanceToPerth) ? formatNumber(distanceToPerth) + ' km' : '—') + '</span>' +
+                    '</div>' +
+                    '<div>' +
+                        '<span class="popup-label">Sealed Roads</span>' +
+                        '<span class="popup-value">' + (hasValue(lengthOfSealedRoadKm) ? formatNumber(lengthOfSealedRoadKm) + ' km' : '—') + '</span>' +
+                    '</div>' +
+                    '<div>' +
+                        '<span class="popup-label">Unsealed Roads</span>' +
+                        '<span class="popup-value">' + (hasValue(lengthOfUnsealedRoadKm) ? formatNumber(lengthOfUnsealedRoadKm) + ' km' : '—') + '</span>' +
+                    '</div>' +
+                    '<div>' +
+                        '<span class="popup-label">Dwellings</span>' +
+                        '<span class="popup-value">' + formatNumber(numberOfDwellings) + '</span>' +
+                    '</div>' +
+                    '<div>' +
+                        '<span class="popup-label">Electors</span>' +
+                        '<span class="popup-value">' + formatNumber(numberOfElectors) + '</span>' +
+                    '</div>' +
+                    '<div>' +
+                        '<span class="popup-label">Phone</span>' +
+                        '<span class="popup-value">' + (phoneNumber || '—') + '</span>' +
+                    '</div>' +
+                    '<div>' +
+                        '<span class="popup-label">Total Rates Levied</span>' +
+                        '<span class="popup-value">' + formatCurrency(totalRatesLevied) + '</span>' +
+                    '</div>' +
+                    '<div>' +
+                        '<span class="popup-label">Total Revenue</span>' +
+                        '<span class="popup-value">' + formatCurrency(totalRevenue) + '</span>' +
+                    '</div>' +
+                    '<div>' +
+                        '<span class="popup-label">Website</span>' +
+                        '<span class="popup-value">' + (websiteLink ? '<a href="' + websiteLink + '" target="_blank" rel="noopener">' + website + '</a>' : '—') + '</span>' +
+                    '</div>' +
+                    '<div>' +
+                        '<span class="popup-label">Email</span>' +
+                        '<span class="popup-value">' + (email ? '<a href="mailto:' + email + '">' + email + '</a>' : '—') + '</span>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+
+            var popup = new mapboxgl.Popup()
+                .setLngLat(event.lngLat)
+                .setHTML(popupHtml)
+                .addTo(map);
+        } 
+        
+        else {
+            console.log('No properties found on the feature.');
+        }
+    } else {
+        console.log('No features found at the clicked location.');
+    }
+});
+
+</script>
+</body>
+</html>
