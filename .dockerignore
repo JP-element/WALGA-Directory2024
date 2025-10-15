@@ -1,0 +1,7 @@
+.git
+.gitignore
+README.md
+Dockerfile
+node_modules
+*.log
+WALGA-Directory2024/
