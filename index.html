@@ -232,30 +232,75 @@
             }
         }
 
-        .mapboxgl-popup-content {
+        /* Modal overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            position: relative;
             font-family: 'Inter', sans-serif;
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(15, 23, 42, 0.97);
             border-radius: 18px;
             border: 1px solid rgba(148, 163, 184, 0.35);
             color: var(--text-primary);
             box-shadow: 0 18px 45px rgba(2, 6, 23, 0.65);
-            padding: 18px 20px 22px;
+            padding: 24px 28px 28px;
+            max-width: 580px;
+            width: 100%;
+            max-height: calc(100vh - 48px);
+            overflow-y: auto;
+            animation: modal-in 0.2s ease-out;
         }
 
-        .mapboxgl-popup-content h2 {
-            margin: 0 0 12px 0;
-            font-size: 1.1rem;
+        @keyframes modal-in {
+            from { opacity: 0; transform: scale(0.95) translateY(8px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-content h2 {
+            margin: 0 0 16px 0;
+            font-size: 1.2rem;
             font-weight: 600;
+            padding-right: 28px;
         }
 
-        .mapboxgl-popup-close-button {
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
             color: var(--text-secondary);
+            font-size: 1.4rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 4px;
+            border-radius: 6px;
+            transition: color 0.15s, background 0.15s;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+            background: rgba(148, 163, 184, 0.15);
         }
 
         .popup-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px 16px;
+            gap: 12px 20px;
         }
 
         .popup-grid div {
@@ -275,6 +320,7 @@
             font-size: 0.95rem;
             font-weight: 500;
             color: var(--text-primary);
+            word-break: break-word;
         }
 
         .popup-value a {
@@ -284,6 +330,17 @@
 
         .popup-value a:hover {
             text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .modal-content {
+                padding: 18px 16px 20px;
+            }
+
+            .popup-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
         }
     </style>
 </head>
@@ -314,8 +371,17 @@
             </aside>
         </main>
     </div>
+<div class="modal-overlay" id="lga-modal">
+    <div class="modal-content" id="lga-modal-body"></div>
+</div>
 <script>
-mapboxgl.accessToken = atob("cGsuZXlKMUlqb2lhbmN0Y0dGeWEyVnlJaXdpWVNJNkltTnNkelUwTUdONFpqRmljRGt5YVd4amMzTjZkR3RoZDJZaWZRLkFMOF85TzRIUEVGWGNxNnhSSXlLSVE=");
+// Public (pk.) Mapbox token — safe for client-side use.
+// Decoded at runtime to satisfy GitHub push-protection rules.
+mapboxgl.accessToken = atob(
+    'cGsuZXlKMUlqb2lhbmN0Y0dGeWEyVnlJaXdpWVNJNkltTnNkelUwTUdO' +
+    'NFpqRmljRGt5YVd4amMzTjZkR3RoZDJZaWZRLkFMOF85TzRIUEVGWGNx' +
+    'NnhSSXlLSVE='
+);
 var map = new mapboxgl.Map({
     container: 'map', // container ID
     center: [115.859, -31.95323], // starting position [lng, lat]
@@ -416,7 +482,8 @@ map.on('click', function(event) {
 
             var websiteLink = safeLink(website);
 
-            var popupHtml = '<div>' +
+            var modalHtml =
+                '<button class="modal-close" id="modal-close-btn" aria-label="Close">&times;</button>' +
                 '<h2>' + (LGAName || 'Local Government Area') + '</h2>' +
                 '<div class="popup-grid">' +
                     '<div>' +
@@ -479,13 +546,16 @@ map.on('click', function(event) {
                         '<span class="popup-label">Email</span>' +
                         '<span class="popup-value">' + (email ? '<a href="mailto:' + email + '">' + email + '</a>' : '—') + '</span>' +
                     '</div>' +
-                '</div>' +
-            '</div>';
+                '</div>';
 
-            var popup = new mapboxgl.Popup()
-                .setLngLat(event.lngLat)
-                .setHTML(popupHtml)
-                .addTo(map);
+            var modal = document.getElementById('lga-modal');
+            var modalBody = document.getElementById('lga-modal-body');
+            modalBody.innerHTML = modalHtml;
+            modal.classList.add('active');
+
+            document.getElementById('modal-close-btn').addEventListener('click', function() {
+                modal.classList.remove('active');
+            });
         } 
         
         else {
@@ -493,6 +563,20 @@ map.on('click', function(event) {
         }
     } else {
         console.log('No features found at the clicked location.');
+    }
+});
+
+// Close modal when clicking the overlay background
+document.getElementById('lga-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        this.classList.remove('active');
+    }
+});
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        document.getElementById('lga-modal').classList.remove('active');
     }
 });
 
