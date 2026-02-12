@@ -460,7 +460,7 @@ map.on('click', function(event) {
                 ? Number(Population) / Number(areaSqkm)
                 : null;
             var roundedPopulationDensity = (populationDensity !== null && !isNaN(populationDensity))
-                ? Math.round(populationDensity)
+                ? parseFloat(populationDensity.toFixed(2))
                 : null;
 
             var safeLink = function(url) {
